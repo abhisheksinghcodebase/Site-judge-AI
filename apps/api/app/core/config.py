@@ -7,7 +7,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # Database
-    database_url: str = "postgresql+asyncpg://sitejudge:sitejudge@db:5432/sitejudge"
+    database_url: str = "sqlite+aiosqlite:///./sitejudge.db"
+
+    # Queue (set USE_CELERY=False to run scans via FastAPI BackgroundTasks without Redis)
+    use_celery: bool = True
 
     # Redis / Celery
     redis_url: str = "redis://redis:6379/0"

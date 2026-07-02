@@ -14,7 +14,28 @@ from sqlalchemy import (
     Enum,
     func,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.types import TypeDecorator, CHAR
+
+# Dialect-independent GUID type for SQLite + PostgreSQL compatibility
+class GUID(TypeDecorator):
+    impl = CHAR
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            from sqlalchemy.dialects.postgresql import UUID as pgUUID
+            return dialect.type_descriptor(pgUUID(as_uuid=False))
+        else:
+            return dialect.type_descriptor(CHAR(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        return str(value)
+
+    def process_result_value(self, value, dialect):
+        return value
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -47,7 +68,7 @@ class IssueCategory(str, PyEnum):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id: Mapped[str] = mapped_column(GUID, primary_key=True, default=lambda: str(uuid.uuid4()))
     clerk_user_id: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -58,8 +79,8 @@ class User(Base):
 class Project(Base):
     __tablename__ = "projects"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("users.id"), index=True)
+    id: Mapped[str] = mapped_column(GUID, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(GUID, ForeignKey("users.id"), index=True)
     url: Mapped[str] = mapped_column(String(2048))
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -71,9 +92,9 @@ class Project(Base):
 class Scan(Base):
     __tablename__ = "scans"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id: Mapped[str] = mapped_column(GUID, primary_key=True, default=lambda: str(uuid.uuid4()))
     url: Mapped[str] = mapped_column(String(2048))  # Direct URL scan (no project required for MVP)
-    project_id: Mapped[str | None] = mapped_column(UUID(as_uuid=False), ForeignKey("projects.id"), nullable=True, index=True)
+    project_id: Mapped[str | None] = mapped_column(GUID, ForeignKey("projects.id"), nullable=True, index=True)
     status: Mapped[ScanStatus] = mapped_column(Enum(ScanStatus), default=ScanStatus.QUEUED, index=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -87,8 +108,8 @@ class Scan(Base):
 class Report(Base):
     __tablename__ = "reports"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    scan_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("scans.id"), unique=True, index=True)
+    id: Mapped[str] = mapped_column(GUID, primary_key=True, default=lambda: str(uuid.uuid4()))
+    scan_id: Mapped[str] = mapped_column(GUID, ForeignKey("scans.id"), unique=True, index=True)
 
     # Overall
     overall_score: Mapped[int] = mapped_column(Integer, default=0)
@@ -116,8 +137,8 @@ class Report(Base):
 class Issue(Base):
     __tablename__ = "issues"
 
-    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()))
-    report_id: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("reports.id"), index=True)
+    id: Mapped[str] = mapped_column(GUID, primary_key=True, default=lambda: str(uuid.uuid4()))
+    report_id: Mapped[str] = mapped_column(GUID, ForeignKey("reports.id"), index=True)
 
     title: Mapped[str] = mapped_column(String(512))
     severity: Mapped[IssueSeverity] = mapped_column(Enum(IssueSeverity), index=True)

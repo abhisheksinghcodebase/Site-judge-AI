@@ -60,6 +60,7 @@ docker-compose*.yml
 Thumbs.db
 ehthumbs.db
 desktop.ini
+*.db
 
 # ── IDE / Editor ────────────────────────────
 .idea/
