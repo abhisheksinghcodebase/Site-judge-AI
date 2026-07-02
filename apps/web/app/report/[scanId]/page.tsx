@@ -126,18 +126,17 @@ export default function ReportPage() {
         <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}>
           <button onClick={() => router.push("/")} style={{
             display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer",
-            fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1rem",
             padding: 0,
           }}>
             <img src="/logo.svg" alt="SiteJudge AI Logo" style={{ width: 32, height: 32, borderRadius: 8, boxShadow: "0 4px 12px rgba(139,92,246,0.25)" }} />
-            <span style={{
+            <span className="nav-logo-text" style={{
               background: "linear-gradient(135deg, #c4b5fd, #818cf8)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>SiteJudge AI</span>
           </button>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{
+            <div className="hidden sm:block" style={{
               padding: "5px 14px", borderRadius: 99,
               background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)",
               fontSize: "0.8rem", color: "var(--text-2)",

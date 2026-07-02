@@ -147,8 +147,7 @@ export default function HomePage() {
           {/* Logo */}
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             <img src="/logo.svg" alt="SiteJudge AI Logo" style={{ width: 32, height: 32, borderRadius: 8, boxShadow: "0 4px 12px rgba(139,92,246,0.25)" }} />
-            <span style={{
-              fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.1rem",
+            <span className="nav-logo-text" style={{
               background: "linear-gradient(135deg, #c4b5fd, #818cf8)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
             }}>SiteJudge AI</span>
@@ -169,18 +168,92 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* CTA */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* CTA & Mobile Menu Toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button
-              className="btn btn-primary"
+              className="btn btn-primary hidden sm:inline-flex"
               style={{ padding: "9px 20px", fontSize: "0.85rem" }}
               onClick={() => document.getElementById("url-input")?.focus()}
             >
               Free audit →
             </button>
+
+            {/* Hamburger Button */}
+            <button
+              className="flex sm:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--text-1)",
+                fontSize: "1.6rem",
+                cursor: "pointer",
+                padding: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                lineHeight: 1,
+              }}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? "✕" : "☰"}
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Nav Drawer */}
+      {mobileMenuOpen && (
+        <div 
+          className="mobile-menu-drawer sm:hidden"
+          style={{
+            position: "fixed",
+            top: 64,
+            left: 0,
+            width: "100%",
+            background: "rgba(5,5,8,0.96)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderBottom: "1px solid var(--border)",
+            zIndex: 99,
+            padding: "24px 16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {NAV_LINKS.map(l => (
+              <a 
+                key={l.label} 
+                href={l.href} 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: "12px 16px",
+                  borderRadius: "var(--r-md)",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  color: "var(--text-2)",
+                  textDecoration: "none",
+                  background: "rgba(255,255,255,0.02)",
+                }}
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+          <button
+            className="btn btn-primary"
+            style={{ width: "100%", padding: "14px", fontSize: "0.95rem" }}
+            onClick={() => {
+              setMobileMenuOpen(false);
+              document.getElementById("url-input")?.focus();
+            }}
+          >
+            Free audit →
+          </button>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════════
           HERO
@@ -203,7 +276,7 @@ export default function HomePage() {
 
           {/* Headline */}
           <h1 className="heading-display anim-fade-up delay-1" style={{
-            fontSize: "clamp(2.8rem, 7vw, 5.5rem)",
+            fontSize: "clamp(2.2rem, 7vw, 5.5rem)",
             marginBottom: 24,
             lineHeight: 1.05,
           }}>
@@ -225,12 +298,7 @@ export default function HomePage() {
 
           {/* ── URL Input ────────────────────────────────────────── */}
           <form onSubmit={handleSubmit} className="anim-fade-up delay-3" style={{ maxWidth: 680, margin: "0 auto" }}>
-            <div style={{
-              display: "flex", gap: 10, flexWrap: "wrap",
-              background: "rgba(17,17,32,0.9)", border: "1.5px solid var(--border-strong)",
-              borderRadius: "var(--r-xl)", padding: 8,
-              boxShadow: "0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.1)",
-            }}>
+            <div className="hero-form-container">
               <input
                 id="url-input"
                 type="text"
@@ -238,14 +306,9 @@ export default function HomePage() {
                 value={url}
                 onChange={e => setUrl(e.target.value)}
                 disabled={loading}
-                style={{
-                  flex: 1, minWidth: 200,
-                  padding: "12px 18px", fontSize: "1rem",
-                  background: "transparent", border: "none", outline: "none",
-                  color: "var(--text-1)", fontFamily: "var(--font-sans)",
-                }}
+                className="hero-form-input"
               />
-              <button type="submit" className="btn btn-primary" disabled={loading || !url.trim()} id="scan-submit-btn">
+              <button type="submit" className="btn btn-primary hero-form-btn" disabled={loading || !url.trim()} id="scan-submit-btn">
                 {loading ? <><span className="spinner" /> Scanning…</> : <>⚡ Audit now</>}
               </button>
             </div>

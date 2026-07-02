@@ -412,7 +412,7 @@ select.input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0;
   height: 64px;
   background: rgba(5,5,8,0.85);
   backdrop-filter: blur(20px);
@@ -496,4 +496,69 @@ select.input {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
+}
+
+/* ── ADDITIONAL RESPONSIVE & MOBILE DESIGN UTILITIES ── */
+.nav-logo-text {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+@media (max-width: 480px) {
+  .nav-logo-text {
+    display: none; /* Hide logo text on small screens, only keep icon */
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.mobile-menu-drawer {
+  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── HERO FORM RESPONSIVENESS ── */
+.hero-form-container {
+  display: flex;
+  gap: 10px;
+  background: rgba(17,17,32,0.9);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-xl);
+  padding: 8px;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.1);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.hero-form-container:focus-within {
+  border-color: var(--violet);
+  box-shadow: 0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px var(--violet);
+}
+.hero-form-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 18px;
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-1);
+  font-family: var(--font-sans);
+}
+@media (max-width: 640px) {
+  .hero-form-container {
+    flex-direction: column;
+    padding: 12px;
+    border-radius: var(--r-lg);
+  }
+  .hero-form-input {
+    width: 100% !important;
+    text-align: center;
+    padding: 12px 8px !important;
+  }
+  .hero-form-btn {
+    width: 100% !important;
+    justify-content: center;
+  }
 }
