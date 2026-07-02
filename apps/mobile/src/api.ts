@@ -5,7 +5,7 @@
  * to your development machine. Change this URL to your machine's local IP address
  * (e.g. "http://192.168.1.100:8000") so the phone can communicate with the backend.
  */
-export const API_URL = "http://localhost:8000";
+export const API_URL = "http://172.16.144.11:8000";
 
 export interface Scan {
   id: string;
