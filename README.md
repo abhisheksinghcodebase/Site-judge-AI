@@ -122,6 +122,6 @@ npm run dev
 Created with ⚖️ by **Abhishek Singh**:
 
 - **GitHub**: [@abhisheksinghcodebase](https://github.com/abhisheksinghcodebase)
-- **LinkedIn**: [Abhishek Singh](https://linkedin.com/in/abhisheksinghcodebase)
+- **LinkedIn**: [Abhishek Singh](https://linkedin.com/in/abhisheksinghcode)
 
 Feel free to open an issue or submit a pull request!
