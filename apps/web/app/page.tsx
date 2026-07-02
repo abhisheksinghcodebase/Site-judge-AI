@@ -154,7 +154,7 @@ export default function HomePage() {
           </a>
 
           {/* Desktop nav links */}
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }} className="hidden sm:flex">
+          <div className="nav-desktop-links">
             {NAV_LINKS.map(l => (
               <a key={l.label} href={l.href} style={{
                 padding: "8px 16px", borderRadius: "var(--r-md)", fontSize: "0.875rem",
@@ -171,7 +171,7 @@ export default function HomePage() {
           {/* CTA & Mobile Menu Toggle */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button
-              className="btn btn-primary hidden sm:inline-flex"
+              className="btn btn-primary nav-desktop-cta"
               style={{ padding: "9px 20px", fontSize: "0.85rem" }}
               onClick={() => document.getElementById("url-input")?.focus()}
             >
@@ -180,7 +180,7 @@ export default function HomePage() {
 
             {/* Hamburger Button */}
             <button
-              className="flex sm:hidden"
+              className="nav-hamburger"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
                 background: "transparent",
@@ -189,9 +189,6 @@ export default function HomePage() {
                 fontSize: "1.6rem",
                 cursor: "pointer",
                 padding: 4,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 lineHeight: 1,
               }}
               aria-label="Toggle menu"
@@ -205,7 +202,7 @@ export default function HomePage() {
       {/* Mobile Nav Drawer */}
       {mobileMenuOpen && (
         <div 
-          className="mobile-menu-drawer sm:hidden"
+          className="mobile-menu-drawer"
           style={{
             position: "fixed",
             top: 64,

@@ -505,9 +505,41 @@ select.input {
   font-weight: 800;
   font-size: 1.1rem;
 }
-@media (max-width: 480px) {
+@media (max-width: 580px) {
   .nav-logo-text {
-    display: none; /* Hide logo text on small screens, only keep icon */
+    display: none; /* Hide logo text on mobile/tablet viewports */
+  }
+}
+
+/* Custom Navigation Responsive Classes (Bypasses potential Tailwind build issues) */
+.nav-desktop-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+@media (max-width: 640px) {
+  .nav-desktop-links {
+    display: none !important;
+  }
+}
+
+.nav-desktop-cta {
+  display: inline-flex;
+}
+@media (max-width: 640px) {
+  .nav-desktop-cta {
+    display: none !important;
+  }
+}
+
+.nav-hamburger {
+  display: none !important;
+}
+@media (max-width: 640px) {
+  .nav-hamburger {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -517,7 +549,14 @@ select.input {
 }
 
 .mobile-menu-drawer {
+  display: flex;
+  flex-direction: column;
   animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@media (min-width: 641px) {
+  .mobile-menu-drawer {
+    display: none !important;
+  }
 }
 
 /* ── HERO FORM RESPONSIVENESS ── */
