@@ -115,6 +115,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [statsImageError, setStatsImageError] = useState(false);
+  const [streakImageError, setStreakImageError] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -580,18 +582,50 @@ export default function HomePage() {
               {/* Profile widgets */}
               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
                 <a href="https://github.com/abhisheksinghcodebase" target="_blank" rel="noopener noreferrer" style={{ display: "block" }}>
-                  <img 
-                    src="https://github-readme-stats.vercel.app/api?username=abhisheksinghcodebase&show_icons=true&theme=tokyonight&hide_border=true&bg_color=00000000" 
-                    alt="Abhishek's GitHub Stats" 
-                    style={{ width: "100%", height: "auto", borderRadius: 8 }} 
-                  />
+                  {statsImageError ? (
+                    <div style={{
+                      padding: "16px",
+                      borderRadius: 8,
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px dashed var(--border-strong)",
+                      textAlign: "center",
+                      fontSize: "0.85rem",
+                      color: "var(--text-3)"
+                    }}>
+                      <span style={{ fontSize: "1.2rem", display: "block", marginBottom: 6 }}>📊</span>
+                      GitHub stats temporarily unavailable.
+                    </div>
+                  ) : (
+                    <img 
+                      src="https://github-readme-stats.vercel.app/api?username=abhisheksinghcodebase&show_icons=true&theme=tokyonight&hide_border=true&bg_color=00000000" 
+                      alt="Abhishek's GitHub Stats" 
+                      onError={() => setStatsImageError(true)}
+                      style={{ width: "100%", height: "auto", borderRadius: 8 }} 
+                    />
+                  )}
                 </a>
                 <a href="https://github.com/abhisheksinghcodebase" target="_blank" rel="noopener noreferrer" style={{ display: "block" }}>
-                  <img 
-                    src="https://github-readme-streak-stats.herokuapp.com/?user=abhisheksinghcodebase&theme=tokyonight&hide_border=true&background=00000000" 
-                    alt="Abhishek's GitHub Streak" 
-                    style={{ width: "100%", height: "auto", borderRadius: 8 }} 
-                  />
+                  {streakImageError ? (
+                    <div style={{
+                      padding: "16px",
+                      borderRadius: 8,
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px dashed var(--border-strong)",
+                      textAlign: "center",
+                      fontSize: "0.85rem",
+                      color: "var(--text-3)"
+                    }}>
+                      <span style={{ fontSize: "1.2rem", display: "block", marginBottom: 6 }}>🔥</span>
+                      GitHub streak statistics temporarily offline.
+                    </div>
+                  ) : (
+                    <img 
+                      src="https://github-readme-streak-stats.herokuapp.com/?user=abhisheksinghcodebase&theme=tokyonight&hide_border=true&background=00000000" 
+                      alt="Abhishek's GitHub Streak" 
+                      onError={() => setStreakImageError(true)}
+                      style={{ width: "100%", height: "auto", borderRadius: 8 }} 
+                    />
+                  )}
                 </a>
               </div>
             </div>
