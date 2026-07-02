@@ -288,7 +288,11 @@ export default function HomePage() {
                 className="hero-form-input"
               />
               <button type="submit" className="btn btn-primary hero-form-btn" disabled={loading || !url.trim()} id="scan-submit-btn">
-                {loading ? <><span className="spinner" /> Scanning…</> : <>⚡ Audit now</>}
+                {loading ? (
+                  <><span className="spinner" /> <span className="hero-form-btn-text">Scanning…</span></>
+                ) : (
+                  <>⚡<span className="hero-form-btn-text">&nbsp;Audit now</span></>
+                )}
               </button>
             </div>
 
@@ -351,7 +355,7 @@ export default function HomePage() {
             </div>
 
             {/* Score grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
+            <div className="preview-score-grid">
               {SCORES_PREVIEW.map(({ label, score, color }) => (
                 <div key={label} style={{
                   background: "rgba(255,255,255,0.025)", borderRadius: "var(--r-md)",
@@ -534,7 +538,7 @@ export default function HomePage() {
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 10 }}>
+              <div className="developer-buttons" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 10 }}>
                 <a href="https://github.com/abhisheksinghcodebase/Site-judge-AI" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", textDecoration: "none", fontSize: "0.85rem" }}>
                   ⭐ Star on GitHub
                 </a>
