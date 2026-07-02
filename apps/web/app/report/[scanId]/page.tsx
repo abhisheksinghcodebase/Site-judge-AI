@@ -20,6 +20,7 @@ const CATEGORIES: { key: keyof Report["scores"]; label: string; icon: string }[]
   { key: "best_practices", label: "Best Practices", icon: "✅" },
   { key: "ux",             label: "UX",             icon: "🎨" },
   { key: "responsiveness", label: "Responsiveness", icon: "📱" },
+  { key: "code_quality",   label: "Code Quality",   icon: "💻" },
 ];
 
 export default function ReportPage() {
@@ -230,7 +231,7 @@ export default function ReportPage() {
             Category Breakdown
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-            {CATEGORIES.map(({ key, label, icon }) => (
+            {CATEGORIES.filter(cat => report.scores[cat.key] !== null).map(({ key, label, icon }) => (
               <ScoreCard key={key} score={report.scores[key]} label={label} icon={icon} size="sm" />
             ))}
           </div>

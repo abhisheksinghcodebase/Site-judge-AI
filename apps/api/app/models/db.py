@@ -63,6 +63,7 @@ class IssueCategory(str, PyEnum):
     UX = "ux"
     RESPONSIVENESS = "responsiveness"
     BROKEN_LINKS = "broken_links"
+    CODE_QUALITY = "code_quality"
 
 
 class User(Base):
@@ -123,6 +124,7 @@ class Report(Base):
     best_practices: Mapped[int | None] = mapped_column(Integer, nullable=True)
     ux: Mapped[int | None] = mapped_column(Integer, nullable=True)
     responsiveness: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    code_quality: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # Screenshots (base64 encoded)
     screenshot_desktop: Mapped[str | None] = mapped_column(Text, nullable=True)

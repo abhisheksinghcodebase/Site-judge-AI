@@ -55,7 +55,7 @@ def run_scan_task(self, scan_id: str):
 
         # ── Run the audit (async inside sync Celery task) ──────────────
         print(f"[celery] Starting audit for scan {scan_id}: {scan.url}")
-        report_data = asyncio.run(run_full_audit(scan.url))
+        report_data = asyncio.run(run_full_audit(scan.url, scan_id))
 
         # ── Persist report ─────────────────────────────────────────────
         scores = report_data.get("scores", {})
@@ -70,6 +70,7 @@ def run_scan_task(self, scan_id: str):
             best_practices=scores.get("best_practices"),
             ux=scores.get("ux"),
             responsiveness=scores.get("responsiveness"),
+            code_quality=scores.get("code_quality"),
             screenshot_desktop=report_data.get("screenshot_desktop"),
             screenshot_mobile=report_data.get("screenshot_mobile"),
         )

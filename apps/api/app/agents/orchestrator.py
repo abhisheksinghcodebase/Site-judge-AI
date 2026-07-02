@@ -130,11 +130,23 @@ def build_audit_graph():
 audit_graph = build_audit_graph()
 
 
-async def run_full_audit(url: str) -> dict:
+def is_github_repo(url: str) -> bool:
+    """Check if the given URL points to a GitHub repository."""
+    clean = url.lower().strip()
+    return "github.com" in clean or clean.startswith("github.com")
+
+
+async def run_full_audit(url: str, scan_id: str = "") -> dict:
     """
-    Entry point for running a complete website audit.
-    Returns the final_report dict from the judge agent.
+    Entry point for running a complete website audit (either web URL or GitHub repo).
+    Returns the final_report dict.
     """
+    if is_github_repo(url):
+        import uuid
+        from app.agents.github_agent import run_github_agent
+        sid = scan_id or str(uuid.uuid4())
+        return await run_github_agent(url, sid)
+
     initial_state: AuditState = {
         "url": url,
         "lighthouse_data": None,
@@ -158,3 +170,4 @@ async def run_full_audit(url: str) -> dict:
     report["screenshot_mobile"] = screenshots.get("mobile")
 
     return report
+

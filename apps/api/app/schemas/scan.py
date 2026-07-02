@@ -31,6 +31,7 @@ class IssueCategory(str, Enum):
     UX = "ux"
     RESPONSIVENESS = "responsiveness"
     BROKEN_LINKS = "broken_links"
+    CODE_QUALITY = "code_quality"
 
 
 # ── Scan ──────────────────────────────────────────────────────────────
@@ -84,6 +85,7 @@ class CategoryScores(BaseModel):
     best_practices: Optional[int] = None
     ux: Optional[int] = None
     responsiveness: Optional[int] = None
+    code_quality: Optional[int] = None
 
 
 class ReportResponse(BaseModel):
@@ -114,6 +116,7 @@ class ReportResponse(BaseModel):
                 best_practices=report.best_practices,
                 ux=report.ux,
                 responsiveness=report.responsiveness,
+                code_quality=report.code_quality,
             ),
             issues=[IssueResponse.model_validate(i) for i in report.issues],
             screenshot_desktop=report.screenshot_desktop,

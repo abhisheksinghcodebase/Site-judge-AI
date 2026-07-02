@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     # AI (Groq)
     groq_api_key: str = ""
 
+    # GitHub Integration
+    github_token: str = ""
+
     # CORS
     cors_origins: str = "http://localhost:3000"
 

@@ -36,7 +36,7 @@ async def run_local_scan_async(scan_id: str):
             await db.commit()
 
             print(f"[local-scan] Starting local audit for scan {scan_id}: {scan.url}")
-            report_data = await run_full_audit(scan.url)
+            report_data = await run_full_audit(scan.url, scan_id)
 
             # Persist report
             scores = report_data.get("scores", {})
@@ -51,6 +51,7 @@ async def run_local_scan_async(scan_id: str):
                 best_practices=scores.get("best_practices"),
                 ux=scores.get("ux"),
                 responsiveness=scores.get("responsiveness"),
+                code_quality=scores.get("code_quality"),
                 screenshot_desktop=report_data.get("screenshot_desktop"),
                 screenshot_mobile=report_data.get("screenshot_mobile"),
             )
