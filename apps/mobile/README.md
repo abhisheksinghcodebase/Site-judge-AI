@@ -23,7 +23,8 @@ This is the official mobile application companion for **SiteJudge AI**, built us
 Navigate to the mobile directory and install the packages:
 ```bash
 cd apps/mobile
-npm install
+# We override React 19 peer dependencies in package.json, but you can also run:
+npm install --legacy-peer-deps
 ```
 
 ### 2. Configure Backend Connection (Physical Devices)
