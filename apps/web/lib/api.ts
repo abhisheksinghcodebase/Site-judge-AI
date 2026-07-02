@@ -139,7 +139,7 @@ export const CATEGORY_LABELS: Record<IssueCategory, string> = {
   seo: "SEO",
   security: "Security",
   best_practices: "Best Practices",
-  ux: "UX",
+  ux: "UI/UX Review",
   responsiveness: "Responsiveness",
   broken_links: "Broken Links",
   code_quality: "Code Quality",

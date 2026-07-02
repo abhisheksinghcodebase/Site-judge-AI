@@ -18,7 +18,7 @@ const CATEGORIES: { key: keyof Report["scores"]; label: string; icon: string }[]
   { key: "seo",            label: "SEO",            icon: "🔍" },
   { key: "security",       label: "Security",       icon: "🔒" },
   { key: "best_practices", label: "Best Practices", icon: "✅" },
-  { key: "ux",             label: "UX",             icon: "🎨" },
+  { key: "ux",             label: "UI/UX Review",   icon: "🎨" },
   { key: "responsiveness", label: "Responsiveness", icon: "📱" },
   { key: "code_quality",   label: "Code Quality",   icon: "💻" },
   { key: "efficiency",     label: "Efficiency",     icon: "⚡" },
