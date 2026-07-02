@@ -1,0 +1,21 @@
+{
+  "name": "sitejudge-lighthouse-worker",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Lighthouse + Playwright screenshot worker for SiteJudge AI",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "lighthouse": "^12.0.0",
+    "playwright": "^1.44.0",
+    "chrome-launcher": "^1.1.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
