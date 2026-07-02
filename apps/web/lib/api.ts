@@ -27,6 +27,8 @@ export interface CategoryScores {
   ux?: number | null;
   responsiveness?: number | null;
   code_quality?: number | null;
+  efficiency?: number | null;
+  alignment?: number | null;
 }
 
 export type IssueSeverity = "critical" | "medium" | "minor";
@@ -39,7 +41,9 @@ export type IssueCategory =
   | "ux"
   | "responsiveness"
   | "broken_links"
-  | "code_quality";
+  | "code_quality"
+  | "efficiency"
+  | "alignment";
 
 export interface Issue {
   id: string;
@@ -139,6 +143,8 @@ export const CATEGORY_LABELS: Record<IssueCategory, string> = {
   responsiveness: "Responsiveness",
   broken_links: "Broken Links",
   code_quality: "Code Quality",
+  efficiency: "Efficiency",
+  alignment: "Alignment",
 };
 
 export const CATEGORY_ICONS: Record<string, string> = {
@@ -151,4 +157,6 @@ export const CATEGORY_ICONS: Record<string, string> = {
   responsiveness: "📱",
   broken_links: "🔗",
   code_quality: "💻",
+  efficiency: "⚡",
+  alignment: "🎯",
 };

@@ -21,6 +21,8 @@ const CATEGORIES: { key: keyof Report["scores"]; label: string; icon: string }[]
   { key: "ux",             label: "UX",             icon: "🎨" },
   { key: "responsiveness", label: "Responsiveness", icon: "📱" },
   { key: "code_quality",   label: "Code Quality",   icon: "💻" },
+  { key: "efficiency",     label: "Efficiency",     icon: "⚡" },
+  { key: "alignment",      label: "Alignment",      icon: "🎯" },
 ];
 
 export default function ReportPage() {

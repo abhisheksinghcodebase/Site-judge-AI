@@ -32,6 +32,8 @@ class IssueCategory(str, Enum):
     RESPONSIVENESS = "responsiveness"
     BROKEN_LINKS = "broken_links"
     CODE_QUALITY = "code_quality"
+    EFFICIENCY = "efficiency"
+    ALIGNMENT = "alignment"
 
 
 # ── Scan ──────────────────────────────────────────────────────────────
@@ -86,6 +88,8 @@ class CategoryScores(BaseModel):
     ux: Optional[int] = None
     responsiveness: Optional[int] = None
     code_quality: Optional[int] = None
+    efficiency: Optional[int] = None
+    alignment: Optional[int] = None
 
 
 class ReportResponse(BaseModel):
@@ -117,6 +121,8 @@ class ReportResponse(BaseModel):
                 ux=report.ux,
                 responsiveness=report.responsiveness,
                 code_quality=report.code_quality,
+                efficiency=report.efficiency,
+                alignment=report.alignment,
             ),
             issues=[IssueResponse.model_validate(i) for i in report.issues],
             screenshot_desktop=report.screenshot_desktop,

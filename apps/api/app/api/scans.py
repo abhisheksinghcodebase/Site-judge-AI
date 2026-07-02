@@ -52,6 +52,8 @@ async def run_local_scan_async(scan_id: str):
                 ux=scores.get("ux"),
                 responsiveness=scores.get("responsiveness"),
                 code_quality=scores.get("code_quality"),
+                efficiency=scores.get("efficiency"),
+                alignment=scores.get("alignment"),
                 screenshot_desktop=report_data.get("screenshot_desktop"),
                 screenshot_mobile=report_data.get("screenshot_mobile"),
             )

@@ -210,13 +210,15 @@ Analyze the files and output a JSON object matching this schema exactly:
     "best_practices": <integer 0-100>,
     "ux": <integer 0-100>,
     "responsiveness": <integer 0-100>,
-    "code_quality": <integer 0-100>
+    "code_quality": <integer 0-100>,
+    "efficiency": <integer 0-100>,
+    "alignment": <integer 0-100>
   }},
   "issues": [
     {{
       "title": "<concise issue title>",
       "severity": "<critical|medium|minor>",
-      "category": "<performance|accessibility|seo|security|best_practices|ux|responsiveness|code_quality>",
+      "category": "<performance|accessibility|seo|security|best_practices|ux|responsiveness|code_quality|efficiency|alignment>",
       "description": "<plain English code review explaining the flaw>",
       "impact": "<specific code execution, bundling, or user impact>",
       "fix_suggestion": "<detailed code fix recommendation>",
@@ -225,6 +227,11 @@ Analyze the files and output a JSON object matching this schema exactly:
     }}
   ]
 }}
+
+ALIGNMENT EVALUATION GUIDELINES:
+- Determine the purpose/goal of the project (e.g. static site, high-scale SaaS API, mobile frontend, database service) based on package.json dependencies, configs, and directory structure.
+- Judge how aligned the code implementation is with this purpose (e.g., does it use appropriate design patterns? Is it overengineered? Does it lack essential modules?).
+
 
 Ensure every issue lists a concrete file path or component name in the description (e.g. "In components/Button.tsx...").
 Return ONLY the JSON.

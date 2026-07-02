@@ -59,7 +59,7 @@ URL: {url}
 Produce a JSON object matching EXACTLY this schema:
 {{
   "overall_score": <integer 0-100>,
-  "executive_summary": "<3 sentence summary of production readiness, biggest risks, and top recommendation>",
+  "executive_summary": "<3 sentence summary of production readiness, alignment with the website's core purpose, biggest risks, and top recommendation>",
   "scores": {{
     "performance": <integer 0-100 or null>,
     "accessibility": <integer 0-100 or null>,
@@ -67,21 +67,27 @@ Produce a JSON object matching EXACTLY this schema:
     "security": <integer 0-100 or null>,
     "best_practices": <integer 0-100 or null>,
     "ux": <integer 0-100 or null>,
-    "responsiveness": <integer 0-100 or null>
+    "responsiveness": <integer 0-100 or null>,
+    "efficiency": <integer 0-100 or null>,
+    "alignment": <integer 0-100 or null>
   }},
   "issues": [
     {{
       "title": "<concise issue title>",
       "severity": "<critical|medium|minor>",
-      "category": "<performance|accessibility|seo|security|best_practices|ux|responsiveness|broken_links>",
+      "category": "<performance|accessibility|seo|security|best_practices|ux|responsiveness|broken_links|efficiency|alignment>",
       "description": "<plain English explanation of the problem>",
-      "impact": "<specific user or business impact>",
+      "impact": "<specific user, business, or operational alignment impact>",
       "fix_suggestion": "<concrete, actionable fix>",
       "code_example": "<code snippet showing the fix, or null if not applicable>",
       "confidence": <float 0.0-1.0>
     }}
   ]
 }}
+
+SCORING DEVIATIONS FOR PURPOSE ALIGNMENT:
+- Deduce the website's intent/purpose from the headers, keywords, and text in the SEO data.
+- Rate the "alignment" score (0-100) based on how well the landing page elements and architecture support that purpose (e.g. calls to action are visible, purpose is explained above the fold, no conflicting messages).
 
 Include ALL issues found across all agents. Sort issues by: critical first, then by confidence descending.
 Return ONLY the JSON object, nothing else.
