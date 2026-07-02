@@ -96,7 +96,7 @@ def extract_repo_zip(zip_path: str, extract_dir: str) -> str | None:
         return None
 
 
-def collect_repo_sources(root_dir: str, max_files: int = 15, max_chars_per_file: int = 6000) -> dict:
+def collect_repo_sources(root_dir: str, max_files: int = 5, max_chars_per_file: int = 1500) -> dict:
     """Traverse directory and collect structure + contents of key source files."""
     structure = []
     sources = {}
@@ -127,23 +127,40 @@ def collect_repo_sources(root_dir: str, max_files: int = 15, max_chars_per_file:
             is_critical = file in critical_filenames
             is_code = ext in CODE_EXTENSIONS
 
+            # Skip common non-source config files to save tokens
+            if file in {"package-lock.json", "yarn.lock", "pnpm-lock.yaml", "pnpm-workspace.yaml"}:
+                continue
+
             if (is_critical or is_code) and files_read < max_files:
                 try:
                     # Skip files that are too large (likely lockfiles or generated assets)
-                    if os.path.getsize(file_path) > 100 * 1024 and not is_critical:
+                    if os.path.getsize(file_path) > 50 * 1024 and not is_critical:
                         continue
 
                     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                         content = f.read(max_chars_per_file)
                         if len(content) >= max_chars_per_file:
-                            content += "\n... [content truncated due to file size]"
+                            content += "\n... [content truncated]"
+                        
+                        # Minimize package.json down to just dependencies to save huge amount of tokens
+                        if file == "package.json":
+                            try:
+                                import json as json_lib
+                                data = json_lib.loads(content)
+                                content = json_lib.dumps({
+                                    "dependencies": data.get("dependencies", {}),
+                                    "devDependencies": data.get("devDependencies", {})
+                                }, indent=2)
+                            except Exception:
+                                pass
+
                         sources[rel_path] = content
                     files_read += 1
                 except Exception as ex:
                     print(f"[github-agent] Skip reading {rel_path}: {ex}")
 
     return {
-        "structure": structure[:100],  # limit file structure output to keep it compact
+        "structure": structure[:40],  # limit file structure output to keep it compact
         "sources": sources,
     }
 
