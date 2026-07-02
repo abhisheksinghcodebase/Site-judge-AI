@@ -149,10 +149,7 @@ export default function HomePage() {
           {/* Logo */}
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             <img src="/logo.svg" alt="SiteJudge AI Logo" style={{ width: 32, height: 32, borderRadius: 8, boxShadow: "0 4px 12px rgba(139,92,246,0.25)" }} />
-            <span className="nav-logo-text" style={{
-              background: "linear-gradient(135deg, #c4b5fd, #818cf8)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            }}>SiteJudge AI</span>
+            <span className="nav-logo-text">SiteJudge AI</span>
           </a>
 
           {/* Desktop nav links */}
@@ -203,24 +200,7 @@ export default function HomePage() {
 
       {/* Mobile Nav Drawer */}
       {mobileMenuOpen && (
-        <div 
-          className="mobile-menu-drawer"
-          style={{
-            position: "fixed",
-            top: 64,
-            left: 0,
-            width: "100%",
-            background: "rgba(5,5,8,0.96)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            borderBottom: "1px solid var(--border)",
-            zIndex: 99,
-            padding: "24px 16px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 20,
-          }}
-        >
+        <div className="mobile-menu-drawer">
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {NAV_LINKS.map(l => (
               <a 

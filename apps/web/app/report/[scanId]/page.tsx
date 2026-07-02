@@ -79,13 +79,7 @@ export default function ReportPage() {
         {/* Nav */}
         <nav className="nav">
           <div className="container" style={{ display: "flex", alignItems: "center", height: "100%" }}>
-            <button onClick={() => router.push("/")} style={{
-              display: "flex", alignItems: "center", gap: 8, border: "none", cursor: "pointer",
-              fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1rem",
-              background: "linear-gradient(135deg, #c4b5fd, #818cf8)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              padding: 0,
-            }}>
+            <button onClick={() => router.push("/")} className="nav-logo-btn">
               ⚖️ SiteJudge AI
             </button>
           </div>
@@ -129,10 +123,7 @@ export default function ReportPage() {
             padding: 0,
           }}>
             <img src="/logo.svg" alt="SiteJudge AI Logo" style={{ width: 32, height: 32, borderRadius: 8, boxShadow: "0 4px 12px rgba(139,92,246,0.25)" }} />
-            <span className="nav-logo-text" style={{
-              background: "linear-gradient(135deg, #c4b5fd, #818cf8)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            }}>SiteJudge AI</span>
+            <span className="nav-logo-text">SiteJudge AI</span>
           </button>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
