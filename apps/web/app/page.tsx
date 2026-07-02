@@ -9,7 +9,7 @@ import { createScan } from "@/lib/api";
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "How it works", href: "#how" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Developer", href: "#developer" },
 ];
 
 const FEATURES = [
@@ -66,32 +66,7 @@ const SCORES_PREVIEW = [
   { label: "Responsiveness", score: 73, color: "#84cc16" },
 ];
 
-const PLANS = [
-  {
-    name: "Free",
-    price: "$0",
-    sub: "Forever free",
-    features: ["3 scans / day", "All 6 audit categories", "AI explanations", "Priority issue list"],
-    cta: "Start free",
-    highlight: false,
-  },
-  {
-    name: "Pro",
-    price: "$12",
-    sub: "per month",
-    features: ["Unlimited scans", "PDF export", "GitHub integration", "Historical trends", "API access"],
-    cta: "Get Pro",
-    highlight: true,
-  },
-  {
-    name: "Team",
-    price: "$49",
-    sub: "per month",
-    features: ["Everything in Pro", "5 team seats", "CI/CD integration", "Shared dashboards", "Slack alerts", "Priority support"],
-    cta: "Get Team",
-    highlight: false,
-  },
-];
+// PLANS removed for open-source model
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -243,8 +218,9 @@ export default function HomePage() {
             maxWidth: 600, margin: "0 auto 48px",
             lineHeight: 1.7,
           }}>
-            Paste any URL. Our AI runs Lighthouse, Axe, SEO analysis, and broken-link 
-            checking — then reasons over all evidence to give you one scored, prioritised report.
+            SiteJudge AI is a 100% free and open-source production-readiness auditor. 
+            We run Lighthouse, Axe accessibility, SEO crawls, and static codebase analysis 
+            to give you one scored, prioritized report.
           </p>
 
           {/* ── URL Input ────────────────────────────────────────── */}
@@ -278,7 +254,7 @@ export default function HomePage() {
               <p style={{ marginTop: 12, color: "var(--red-light)", fontSize: "0.875rem" }}>{error}</p>
             )}
             <p style={{ marginTop: 12, color: "var(--text-3)", fontSize: "0.8rem" }}>
-              Free · No signup · Results in ~60 seconds
+              Free &amp; Open Source · No signup · Results in ~60 seconds
             </p>
           </form>
         </div>
@@ -449,59 +425,116 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════════
           PRICING
       ══════════════════════════════════════════════════════════ */}
-      <section id="pricing" className="section" style={{ position: "relative", zIndex: 1 }}>
+      {/* ══════════════════════════════════════════════════════════
+          DEVELOPER / OPEN SOURCE SHOWCASE
+      ══════════════════════════════════════════════════════════ */}
+      <section id="developer" className="section" style={{ position: "relative", zIndex: 1 }}>
         <div className="container">
-          <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "6px 16px", borderRadius: 99,
+              background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
+              marginBottom: 16,
+            }}>
+              <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#34d399", letterSpacing: "0.03em" }}>
+                100% Free &amp; Open Source
+              </span>
+            </div>
             <h2 className="heading-display" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", marginBottom: 14 }}>
-              Simple, transparent pricing
+              Meet the <span className="gradient-text">Developer</span>
             </h2>
-            <p style={{ color: "var(--text-2)" }}>Start free. Upgrade when you need more.</p>
+            <p style={{ color: "var(--text-2)", maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+              SiteJudge AI is built for the community. Star the project on GitHub, explore the code, or connect with the creator!
+            </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, maxWidth: 900, margin: "0 auto" }}>
-            {PLANS.map(plan => (
-              <div key={plan.name} style={{ position: "relative" }}>
-                {plan.highlight && (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: 24,
+            maxWidth: 960,
+            margin: "0 auto",
+          }}>
+            {/* Developer profile card */}
+            <div className="card" style={{
+              padding: "32px 28px",
+              background: "linear-gradient(145deg, rgba(20,20,35,0.9), rgba(10,10,20,0.8))",
+              border: "1px solid var(--border)",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              gap: 20,
+            }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18 }}>
                   <div style={{
-                    position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
-                    background: "linear-gradient(135deg, var(--violet-dark), var(--violet))",
-                    color: "#fff", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.7rem",
-                    letterSpacing: "0.08em", textTransform: "uppercase",
-                    padding: "4px 16px", borderRadius: 99, whiteSpace: "nowrap",
-                    boxShadow: "0 4px 12px rgba(139,92,246,0.4)",
-                  }}>Most popular</div>
-                )}
-                <div className="card" style={{
-                  padding: "28px 24px", height: "100%",
-                  border: plan.highlight ? "1.5px solid var(--border-brand)" : "1px solid var(--border)",
-                  boxShadow: plan.highlight ? "var(--shadow-glow)" : "none",
-                  display: "flex", flexDirection: "column", gap: 20,
-                }}>
-                  <div>
-                    <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.1rem", marginBottom: 6 }}>{plan.name}</h3>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                      <span style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "2.4rem", letterSpacing: "-0.04em", color: plan.highlight ? "var(--violet-light)" : "var(--text-1)" }}>
-                        {plan.price}
-                      </span>
-                      <span style={{ color: "var(--text-3)", fontSize: "0.85rem" }}>{plan.sub}</span>
-                    </div>
+                    width: 64, height: 64, borderRadius: "50%",
+                    overflow: "hidden", border: "2px solid var(--violet-light)",
+                    boxShadow: "0 0 16px rgba(139,92,246,0.3)",
+                  }}>
+                    <img src="https://github.com/abhisheksinghcodebase.png" alt="Abhishek Kumar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   </div>
-
-                  <ul style={{ flex: 1, listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-                    {plan.features.map(f => (
-                      <li key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.875rem", color: "var(--text-2)" }}>
-                        <span style={{ color: "var(--green)", fontWeight: 700, fontSize: "0.9rem" }}>✓</span>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button className={`btn ${plan.highlight ? "btn-primary" : "btn-ghost"}`} style={{ width: "100%", padding: "12px" }}>
-                    {plan.cta}
-                  </button>
+                  <div>
+                    <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.25rem", color: "var(--text-1)", marginBottom: 4 }}>
+                      Abhishek Kumar
+                    </h3>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-3)" }}>
+                      B.Tech CSE (AI) Student &amp; Open-Source Enthusiast
+                    </p>
+                  </div>
                 </div>
+                
+                <p style={{ fontSize: "0.9rem", color: "var(--text-2)", lineHeight: 1.65 }}>
+                  I am Abhishek Kumar, currently pursuing my B.Tech in CSE(AI) branch. I have a high interest in building open-source projects, contributing to public repositories, and developing full-stack AI-driven web systems.
+                </p>
               </div>
-            ))}
+
+              {/* Action Buttons */}
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 10 }}>
+                <a href="https://github.com/abhisheksinghcodebase/Site-judge-AI" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", textDecoration: "none", fontSize: "0.85rem" }}>
+                  ⭐ Star on GitHub
+                </a>
+                <a href="https://linkedin.com/in/abhisheksinghcode" target="_blank" rel="noopener noreferrer" className="btn btn-ghost" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", textDecoration: "none", fontSize: "0.85rem", border: "1px solid var(--border)" }}>
+                  💼 Connect on LinkedIn
+                </a>
+              </div>
+            </div>
+
+            {/* GitHub Stats Card */}
+            <div className="card" style={{
+              padding: "24px",
+              background: "rgba(10,10,20,0.4)",
+              border: "1px solid rgba(255,255,255,0.05)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 16,
+            }}>
+              <h4 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.95rem", color: "var(--text-2)", alignSelf: "flex-start", margin: 0 }}>
+                GitHub Activity &amp; Stats
+              </h4>
+              
+              {/* Profile widgets */}
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
+                <a href="https://github.com/abhisheksinghcodebase" target="_blank" rel="noopener noreferrer" style={{ display: "block" }}>
+                  <img 
+                    src="https://github-readme-stats.vercel.app/api?username=abhisheksinghcodebase&show_icons=true&theme=tokyonight&hide_border=true&bg_color=00000000" 
+                    alt="Abhishek's GitHub Stats" 
+                    style={{ width: "100%", height: "auto", borderRadius: 8 }} 
+                  />
+                </a>
+                <a href="https://github.com/abhisheksinghcodebase" target="_blank" rel="noopener noreferrer" style={{ display: "block" }}>
+                  <img 
+                    src="https://github-readme-streak-stats.herokuapp.com/?user=abhisheksinghcodebase&theme=tokyonight&hide_border=true&background=00000000" 
+                    alt="Abhishek's GitHub Streak" 
+                    style={{ width: "100%", height: "auto", borderRadius: 8 }} 
+                  />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -525,18 +558,20 @@ export default function HomePage() {
               pointerEvents: "none",
             }} />
             <h2 className="heading-display" style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)", marginBottom: 16, position: "relative" }}>
-              Ready to audit your site?
+              Join the Open Source Project
             </h2>
             <p style={{ color: "var(--text-2)", maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.7, position: "relative" }}>
-              Join thousands of developers who use SiteJudge to ship with confidence.
+              Help us build the most comprehensive open-source website auditor. Self-host it or run it free!
             </p>
-            <button
+            <a
+              href="https://github.com/abhisheksinghcodebase/Site-judge-AI"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn btn-primary"
-              style={{ fontSize: "1rem", padding: "14px 40px", position: "relative" }}
-              onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => document.getElementById("url-input")?.focus(), 500); }}
+              style={{ fontSize: "1rem", padding: "14px 40px", position: "relative", textDecoration: "none", display: "inline-block" }}
             >
-              ⚡ Audit your site — it's free
-            </button>
+              ⭐ Star on GitHub — It's Free
+            </a>
           </div>
         </div>
       </section>
@@ -553,7 +588,7 @@ export default function HomePage() {
             </span>
           </div>
           <p style={{ color: "var(--text-3)", fontSize: "0.8rem" }}>
-            Powered by Lighthouse · Axe-core · Playwright · LangGraph · Groq
+            Developed by <a href="https://github.com/abhisheksinghcodebase" target="_blank" rel="noopener noreferrer" style={{ color: "var(--violet-light)", textDecoration: "none" }}>Abhishek Kumar</a> · Powered by Lighthouse · Axe · Playwright · LangGraph · Groq
           </p>
         </div>
       </footer>
