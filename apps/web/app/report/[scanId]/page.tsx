@@ -125,10 +125,11 @@ export default function ReportPage() {
       <nav className="nav" style={{ zIndex: 100 }}>
         <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}>
           <button onClick={() => router.push("/")} style={{
-            display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer",
             fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1rem",
+            padding: 0,
           }}>
-            <span style={{ fontSize: 20 }}>⚖️</span>
+            <img src="/logo.svg" alt="SiteJudge AI Logo" style={{ width: 32, height: 32, borderRadius: 8, boxShadow: "0 4px 12px rgba(139,92,246,0.25)" }} />
             <span style={{
               background: "linear-gradient(135deg, #c4b5fd, #818cf8)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",

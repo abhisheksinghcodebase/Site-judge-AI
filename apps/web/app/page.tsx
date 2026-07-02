@@ -171,12 +171,7 @@ export default function HomePage() {
         <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}>
           {/* Logo */}
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div style={{
-              width: 34, height: 34, borderRadius: 10,
-              background: "linear-gradient(135deg, var(--violet-dark), var(--blue))",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 16, boxShadow: "0 4px 12px rgba(139,92,246,0.4)",
-            }}>⚖️</div>
+            <img src="/logo.svg" alt="SiteJudge AI Logo" style={{ width: 32, height: 32, borderRadius: 8, boxShadow: "0 4px 12px rgba(139,92,246,0.25)" }} />
             <span style={{
               fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.1rem",
               background: "linear-gradient(135deg, #c4b5fd, #818cf8)",
