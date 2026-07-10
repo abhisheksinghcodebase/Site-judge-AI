@@ -104,6 +104,21 @@ export async function getReport(scanId: string): Promise<Report> {
   return apiFetch<Report>(`/reports/${scanId}`);
 }
 
+/**
+ * Get the SSE progress stream URL for real-time scan updates.
+ * Use with EventSource in the browser.
+ */
+export function getProgressStreamUrl(scanId: string): string {
+  return `${API_URL}/scans/${scanId}/progress`;
+}
+
+/**
+ * Get the PDF report download URL.
+ */
+export function getPdfDownloadUrl(scanId: string): string {
+  return `${API_URL}/reports/${scanId}/pdf`;
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────
 
 export function getScoreColor(score: number | null | undefined): string {

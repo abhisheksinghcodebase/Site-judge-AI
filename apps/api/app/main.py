@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import scans, reports
+from app.api import scans, reports, progress, pdf_report
 
 
 @asynccontextmanager
@@ -38,6 +38,8 @@ app.add_middleware(
 # ── Routers ────────────────────────────────────────────────────────────
 app.include_router(scans.router)
 app.include_router(reports.router)
+app.include_router(progress.router)
+app.include_router(pdf_report.router)
 
 
 @app.get("/health")

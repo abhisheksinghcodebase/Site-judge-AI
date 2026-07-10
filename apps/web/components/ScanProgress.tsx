@@ -1,186 +1,309 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { ScanStatus } from "@/lib/api";
+import { getProgressStreamUrl } from "@/lib/api";
 
 interface ScanProgressProps {
   status: ScanStatus;
   url: string;
+  scanId: string;
+}
+
+interface TerminalEvent {
+  timestamp: number;
+  event_type: string;
+  agent: string;
+  message: string;
+  detail?: string;
+  step_index?: number;
+  total_steps: number;
 }
 
 const PIPELINE_STEPS = [
-  { id: "seo",       label: "SEO Analysis",          icon: "🔍", color: "#818cf8" },
-  { id: "a11y",      label: "Accessibility Scan",     icon: "♿", color: "#60a5fa" },
-  { id: "links",     label: "Broken Link Check",      icon: "🔗", color: "#34d399" },
-  { id: "lh",        label: "Lighthouse Audit",       icon: "⚡", color: "#fbbf24" },
-  { id: "ai",        label: "AI Reasoning",           icon: "🤖", color: "#a78bfa" },
+  { id: "seo",          label: "SEO Analysis",       icon: "🔍" },
+  { id: "accessibility", label: "Accessibility Scan", icon: "♿" },
+  { id: "broken_links", label: "Link Integrity",      icon: "🔗" },
+  { id: "lighthouse",   label: "Lighthouse Audit",    icon: "⚡" },
+  { id: "judge",        label: "AI Reasoning",        icon: "🤖" },
 ];
 
-const STEP_DURATION_MS = 12000;
+function formatTimestamp(ts: number, startTs: number): string {
+  if (!ts || !startTs) return "00:00";
+  const diff = Math.max(0, Math.floor(ts - startTs));
+  const mins = Math.floor(diff / 60).toString().padStart(2, "0");
+  const secs = (diff % 60).toString().padStart(2, "0");
+  return `${mins}:${secs}`;
+}
 
-export function ScanProgress({ status, url }: ScanProgressProps) {
-  const [activeStep, setActiveStep] = useState(0);
+function buildAsciiBar(pct: number, width: number = 30): { filled: string; empty: string } {
+  const filledLen = Math.round((pct / 100) * width);
+  return {
+    filled: "█".repeat(filledLen),
+    empty: "░".repeat(width - filledLen),
+  };
+}
+
+export function ScanProgress({ status, url, scanId }: ScanProgressProps) {
+  const [lines, setLines] = useState<TerminalEvent[]>([]);
   const [elapsed, setElapsed] = useState(0);
-  const [dots, setDots] = useState(".");
+  const [stepStates, setStepStates] = useState<Record<string, "pending" | "running" | "done">>({});
+  const [isComplete, setIsComplete] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const startTsRef = useRef<number>(0);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
-  // Advance pipeline steps
+  // Connect to SSE progress stream
   useEffect(() => {
-    if (status !== "running") return;
-    const t = setInterval(() => {
-      setActiveStep(p => Math.min(p + 1, PIPELINE_STEPS.length - 1));
-    }, STEP_DURATION_MS);
-    return () => clearInterval(t);
-  }, [status]);
+    if (!scanId || status === "completed" || status === "failed") return;
+
+    const sseUrl = getProgressStreamUrl(scanId);
+    const es = new EventSource(sseUrl);
+    eventSourceRef.current = es;
+
+    es.onmessage = (event) => {
+      try {
+        const data: TerminalEvent = JSON.parse(event.data);
+
+        if (data.event_type === "connected") return;
+
+        // Track start time from first event
+        if (data.timestamp && !startTsRef.current) {
+          startTsRef.current = data.timestamp;
+        }
+
+        setLines((prev) => [...prev, data]);
+
+        // Update step states
+        if (data.event_type === "step_start" && data.agent) {
+          setStepStates((prev) => ({ ...prev, [data.agent]: "running" }));
+        } else if (data.event_type === "step_done" && data.agent) {
+          setStepStates((prev) => ({ ...prev, [data.agent]: "done" }));
+        }
+
+        if (data.event_type === "complete") {
+          setIsComplete(true);
+          es.close();
+        } else if (data.event_type === "error") {
+          setHasError(true);
+          es.close();
+        }
+      } catch { /* ignore parse errors */ }
+    };
+
+    es.onerror = () => {
+      // SSE may error if scan hasn't started pushing events yet — that's OK
+      // EventSource auto-reconnects
+    };
+
+    return () => {
+      es.close();
+      eventSourceRef.current = null;
+    };
+  }, [scanId, status]);
 
   // Elapsed timer
   useEffect(() => {
     if (status !== "running" && status !== "queued") return;
-    const t = setInterval(() => setElapsed(s => s + 1), 1000);
+    if (isComplete) return;
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(t);
-  }, [status]);
+  }, [status, isComplete]);
 
-  // Animated dots
+  // Auto-scroll terminal body
   useEffect(() => {
-    const t = setInterval(() => setDots(d => d.length >= 3 ? "." : d + "."), 500);
-    return () => clearInterval(t);
-  }, []);
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
+    }
+  }, [lines]);
 
-  const progressPct = Math.round(((activeStep + (status === "running" ? 0.5 : 0)) / PIPELINE_STEPS.length) * 100);
+  // Calculate progress percentage from steps
+  const completedSteps = Object.values(stepStates).filter((s) => s === "done").length;
+  const runningSteps = Object.values(stepStates).filter((s) => s === "running").length;
+  const progressPct = Math.round(((completedSteps + runningSteps * 0.5) / PIPELINE_STEPS.length) * 100);
 
-  // ── Queued ────────────────────────────────────────────────────────
-  if (status === "queued") {
+  const bar = buildAsciiBar(isComplete ? 100 : progressPct);
+
+  // ── Queued state ────────────────────────────────────────────────
+  if (status === "queued" && lines.length === 0) {
     return (
-      <div className="card anim-scale-in" style={{ padding: 40, textAlign: "center" }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: "50%",
-          background: "linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.2))",
-          border: "2px solid var(--border-brand)", margin: "0 auto 20px",
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3 }} />
+      <div className="terminal anim-scale-in">
+        <div className="terminal-titlebar">
+          <div className="terminal-dot" style={{ background: "#f87171" }} />
+          <div className="terminal-dot" style={{ background: "#fbbf24" }} />
+          <div className="terminal-dot" style={{ background: "#34d399" }} />
+          <span className="terminal-titlebar-text">sitejudge — waiting for queue</span>
         </div>
-        <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.2rem", marginBottom: 8 }}>
-          Queued for scanning{dots}
-        </p>
-        <p style={{ color: "var(--text-3)", fontSize: "0.875rem", wordBreak: "break-all" }}>{url}</p>
-      </div>
-    );
-  }
-
-  // ── Failed ─────────────────────────────────────────────────────────
-  if (status === "failed") {
-    return (
-      <div className="card anim-scale-in" style={{
-        padding: 40, textAlign: "center",
-        border: "1px solid rgba(239,68,68,0.25)",
-        background: "rgba(239,68,68,0.04)",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>❌</div>
-        <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.2rem", color: "#fca5a5", marginBottom: 8 }}>
-          Scan Failed
-        </p>
-        <p style={{ color: "var(--text-3)", fontSize: "0.875rem" }}>
-          The site may be unavailable, blocking crawlers, or an internal error occurred.
-        </p>
-      </div>
-    );
-  }
-
-  // ── Running ─────────────────────────────────────────────────────────
-  return (
-    <div className="card anim-scale-in" style={{ padding: "clamp(24px, 4vw, 36px)" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, gap: 16, flexWrap: "wrap" }}>
-        <div>
-          <p style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.25rem", marginBottom: 4 }}>
-            Scanning{dots}
-          </p>
-          <p style={{
-            fontSize: "0.82rem", color: "var(--text-3)",
-            wordBreak: "break-all", maxWidth: 400,
-          }}>{url}</p>
-        </div>
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{
-            fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "2rem",
-            background: "linear-gradient(135deg, var(--violet-light), var(--blue-light))",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            letterSpacing: "-0.04em", lineHeight: 1,
-          }}>
-            {elapsed}s
+        <div className="terminal-body" style={{ minHeight: 120 }}>
+          <div className="terminal-line">
+            <span className="terminal-agent terminal-agent-system">[system]</span>
+            <span className="terminal-msg">$ sitejudge --audit {url}</span>
           </div>
-          <p style={{ fontSize: "0.72rem", color: "var(--text-3)", marginTop: 2 }}>elapsed</p>
+          <div className="terminal-line">
+            <span className="terminal-agent terminal-agent-system">[system]</span>
+            <span className="terminal-msg" style={{ color: "#f59e0b" }}>
+              Queued for scanning — waiting for available worker...
+            </span>
+          </div>
+          <div className="terminal-line">
+            <span style={{ color: "#475569" }}>$</span>
+            <span className="terminal-cursor" />
+          </div>
+        </div>
+        <div className="terminal-footer">
+          <span>status: queued</span>
+          <span>{elapsed}s elapsed</span>
         </div>
       </div>
+    );
+  }
 
-      {/* Overall progress bar */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: "0.78rem", color: "var(--text-3)" }}>
-          <span>Pipeline progress</span>
-          <span style={{ color: "var(--violet-light)", fontWeight: 600 }}>{progressPct}%</span>
+  // ── Failed state ────────────────────────────────────────────────
+  if (status === "failed" || (hasError && lines.length > 0)) {
+    return (
+      <div className="terminal anim-scale-in">
+        <div className="terminal-titlebar">
+          <div className="terminal-dot" style={{ background: "#f87171" }} />
+          <div className="terminal-dot" style={{ background: "#fbbf24" }} />
+          <div className="terminal-dot" style={{ background: "#34d399" }} />
+          <span className="terminal-titlebar-text">sitejudge — error</span>
         </div>
-        <div className="progress-track" style={{ height: 6 }}>
-          <div className="progress-fill" style={{
-            width: `${progressPct}%`,
-            background: "linear-gradient(90deg, var(--violet-dark), var(--violet), var(--blue))",
-            boxShadow: "0 0 12px rgba(139,92,246,0.5)",
-          }} />
-        </div>
-      </div>
-
-      {/* Step list */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {PIPELINE_STEPS.map((step, i) => {
-          const isDone = i < activeStep;
-          const isActive = i === activeStep;
-          return (
-            <div key={step.id} style={{
-              display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
-              borderRadius: "var(--r-md)",
-              background: isActive ? "rgba(139,92,246,0.08)" : isDone ? "rgba(16,185,129,0.04)" : "transparent",
-              border: isActive ? "1px solid rgba(139,92,246,0.2)" : "1px solid transparent",
-              transition: "all 0.25s ease",
-            }}>
-              {/* Icon / status indicator */}
-              <div style={{
-                width: 36, height: 36, borderRadius: "var(--r-sm)", flexShrink: 0,
-                background: isDone ? "rgba(16,185,129,0.12)" : isActive ? `${step.color}18` : "rgba(255,255,255,0.03)",
-                border: `1px solid ${isDone ? "rgba(16,185,129,0.2)" : isActive ? `${step.color}33` : "var(--border)"}`,
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17,
-                transition: "all 0.25s",
-              }}>
-                {isDone ? "✓" : step.icon}
-              </div>
-
-              {/* Label */}
-              <span style={{
-                flex: 1, fontSize: "0.9rem", fontWeight: isActive ? 600 : 400,
-                color: isDone ? "var(--green-light)" : isActive ? "var(--text-1)" : "var(--text-3)",
-                transition: "color 0.2s",
-              }}>
-                {step.label}
+        <div className="terminal-body" ref={bodyRef}>
+          {lines.map((line, i) => (
+            <div key={i} className="terminal-line">
+              <span className="terminal-ts">
+                {formatTimestamp(line.timestamp, startTsRef.current)}
               </span>
-
-              {/* Right indicator */}
-              {isDone && (
-                <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--green)", padding: "2px 8px", borderRadius: 99, background: "rgba(16,185,129,0.1)" }}>
-                  Done
-                </span>
-              )}
-              {isActive && <span className="spinner" />}
+              <span className={`terminal-agent terminal-agent-${line.agent}`}>
+                [{line.agent}]
+              </span>
+              <span className={`terminal-msg terminal-msg-${line.event_type}`}>
+                {line.message}
+              </span>
             </div>
-          );
-        })}
+          ))}
+          <div className="terminal-line" style={{ marginTop: 8 }}>
+            <span className="terminal-msg-error" style={{ fontFamily: "var(--font-mono)" }}>
+              ✖ Scan failed. The site may be unavailable or blocking crawlers.
+            </span>
+          </div>
+        </div>
+        <div className="terminal-footer">
+          <span style={{ color: "#f87171" }}>status: failed</span>
+          <span>{elapsed}s elapsed</span>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Running state (main terminal view) ──────────────────────────
+  return (
+    <div className="terminal anim-scale-in">
+      {/* Title bar */}
+      <div className="terminal-titlebar">
+        <div className="terminal-dot" style={{ background: "#f87171" }} />
+        <div className="terminal-dot" style={{ background: "#fbbf24" }} />
+        <div className="terminal-dot" style={{ background: "#34d399" }} />
+        <span className="terminal-titlebar-text">
+          sitejudge — {isComplete ? "complete" : "auditing"} — {url}
+        </span>
       </div>
 
-      <p style={{
-        textAlign: "center", marginTop: 20, padding: "10px 16px",
-        background: "rgba(139,92,246,0.06)", borderRadius: "var(--r-md)",
-        border: "1px solid rgba(139,92,246,0.12)",
-        fontSize: "0.8rem", color: "var(--text-3)",
-      }}>
-        ⏱ Most scans complete in 45–90 seconds
-      </p>
+      {/* Terminal body with streamed logs */}
+      <div className="terminal-body" ref={bodyRef}>
+        {lines.map((line, i) => (
+          <div key={i} className="terminal-line">
+            <span className="terminal-ts">
+              {formatTimestamp(line.timestamp, startTsRef.current)}
+            </span>
+            <span className={`terminal-agent terminal-agent-${line.agent}`}>
+              [{line.agent}]
+            </span>
+            <span className={`terminal-msg terminal-msg-${line.event_type}`}>
+              {line.event_type === "step_start" && "▸ "}
+              {line.event_type === "step_done" && "✓ "}
+              {line.event_type === "complete" && "★ "}
+              {line.event_type === "error" && "✖ "}
+              {line.message}
+            </span>
+          </div>
+        ))}
+
+        {/* Blinking cursor if not complete */}
+        {!isComplete && (
+          <div className="terminal-line" style={{ marginTop: 2 }}>
+            <span style={{ color: "#475569" }}>$</span>
+            <span className="terminal-cursor" />
+          </div>
+        )}
+      </div>
+
+      {/* ASCII Progress Bar */}
+      <div style={{ padding: "0 20px", position: "relative", zIndex: 2 }}>
+        <div className="terminal-progress-bar">
+          <span style={{ color: "#64748b", fontSize: "0.72rem" }}>progress</span>
+          <div className="terminal-progress-track">
+            <span className="terminal-progress-fill">{bar.filled}</span>
+            <span>{bar.empty}</span>
+          </div>
+          <span className="terminal-progress-pct">{isComplete ? 100 : progressPct}%</span>
+        </div>
+
+        {/* Step status indicators */}
+        <div style={{ paddingBottom: 8 }}>
+          {PIPELINE_STEPS.map((step) => {
+            const state = stepStates[step.id] || "pending";
+            return (
+              <div key={step.id} className="terminal-step-row">
+                <span className="terminal-step-icon">
+                  {state === "done" ? "✓" : state === "running" ? "►" : "○"}
+                </span>
+                <span
+                  className="terminal-step-label"
+                  style={{
+                    color:
+                      state === "done"
+                        ? "#34d399"
+                        : state === "running"
+                        ? "#a78bfa"
+                        : "#475569",
+                  }}
+                >
+                  {step.icon} {step.label}
+                </span>
+                <span
+                  className="terminal-step-status"
+                  style={{
+                    color:
+                      state === "done"
+                        ? "#34d399"
+                        : state === "running"
+                        ? "#a78bfa"
+                        : "#334155",
+                  }}
+                >
+                  {state === "done" ? "DONE" : state === "running" ? "RUNNING" : "PENDING"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="terminal-footer">
+        <span>
+          {isComplete ? (
+            <span style={{ color: "#34d399" }}>✓ Audit complete — loading report...</span>
+          ) : (
+            <span>
+              pipeline: {completedSteps}/{PIPELINE_STEPS.length} agents complete
+            </span>
+          )}
+        </span>
+        <span>{elapsed}s elapsed</span>
+      </div>
     </div>
   );
 }

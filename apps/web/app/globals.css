@@ -658,3 +658,257 @@ select.input {
     justify-content: center !important;
   }
 }
+
+/* ══════════════════════════════════════════════
+   TERMINAL PROGRESS PANEL
+══════════════════════════════════════════════ */
+.terminal {
+  background: #0a0a0f;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(139, 92, 246, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+/* Subtle scanline overlay */
+.terminal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.terminal-titlebar-text {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  letter-spacing: 0.05em;
+}
+
+.terminal-body {
+  padding: 16px 20px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.75;
+  max-height: 420px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 2;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
+}
+
+.terminal-body::-webkit-scrollbar {
+  width: 4px;
+}
+.terminal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.terminal-body::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 99px;
+}
+
+.terminal-line {
+  display: flex;
+  gap: 8px;
+  animation: termLine 0.15s ease both;
+  word-break: break-word;
+}
+
+@keyframes termLine {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.terminal-ts {
+  color: #475569;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  min-width: 52px;
+}
+
+.terminal-agent {
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 90px;
+}
+
+.terminal-agent-system       { color: #94a3b8; }
+.terminal-agent-seo          { color: #818cf8; }
+.terminal-agent-accessibility { color: #60a5fa; }
+.terminal-agent-broken_links  { color: #34d399; }
+.terminal-agent-lighthouse   { color: #fbbf24; }
+.terminal-agent-judge        { color: #a78bfa; }
+
+.terminal-msg {
+  color: #cbd5e1;
+}
+
+.terminal-msg-step-start {
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+.terminal-msg-step-done {
+  color: #34d399;
+}
+
+.terminal-msg-error {
+  color: #f87171;
+}
+
+.terminal-msg-complete {
+  color: #34d399;
+  font-weight: 700;
+}
+
+/* Blinking cursor */
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: #a78bfa;
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 4px;
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.5);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+/* ASCII progress bar inside terminal */
+.terminal-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0 6px;
+  color: #a78bfa;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.terminal-progress-track {
+  flex: 1;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  color: #475569;
+}
+
+.terminal-progress-fill {
+  color: #a78bfa;
+}
+
+.terminal-progress-pct {
+  color: #a78bfa;
+  font-weight: 700;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Step status row */
+.terminal-step-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.terminal-step-icon {
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.terminal-step-label {
+  flex: 1;
+}
+
+.terminal-step-status {
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+/* Footer info bar */
+.terminal-footer {
+  padding: 10px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  background: rgba(255, 255, 255, 0.01);
+  position: relative;
+  z-index: 2;
+}
+
+/* Terminal demo for homepage */
+.terminal-demo .terminal-line {
+  animation: termDemoLine 0.3s ease both;
+}
+
+@keyframes termDemoLine {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Download PDF button */
+.btn-download-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+.btn-download-pdf:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+}

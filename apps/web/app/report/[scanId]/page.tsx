@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  getScan, getReport,
+  getScan, getReport, getPdfDownloadUrl,
   type Scan, type Report, type IssueSeverity, type IssueCategory,
   CATEGORY_LABELS, CATEGORY_ICONS, getScoreColor,
 } from "@/lib/api";
@@ -85,7 +85,7 @@ export default function ReportPage() {
           </div>
         </nav>
         <div style={{ maxWidth: 560, margin: "60px auto", padding: "0 24px" }}>
-          <ScanProgress status={scan?.status ?? "queued"} url={scan?.url ?? "…"} />
+          <ScanProgress status={scan?.status ?? "queued"} url={scan?.url ?? "…"} scanId={scanId} />
         </div>
       </div>
     );
@@ -135,6 +135,14 @@ export default function ReportPage() {
             }}>
               {hostname}
             </div>
+            <a
+              href={getPdfDownloadUrl(scanId)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-download-pdf"
+            >
+              📄 Download PDF
+            </a>
             <button className="btn btn-primary" style={{ padding: "8px 18px", fontSize: "0.85rem" }} onClick={() => router.push("/")}>
               New scan
             </button>

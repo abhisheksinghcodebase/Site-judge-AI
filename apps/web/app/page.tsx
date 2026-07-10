@@ -57,26 +57,32 @@ const STEPS = [
   { n: "03", title: "AI writes the report", desc: "LLaMA 3.3 synthesises all evidence into a scored, prioritised, actionable report." },
 ];
 
-const SCORES_PREVIEW = [
-  { label: "Performance",    score: 88, color: "#34d399" },
-  { label: "Accessibility",  score: 64, color: "#f59e0b" },
-  { label: "SEO",            score: 78, color: "#34d399" },
-  { label: "Security",       score: 55, color: "#f97316" },
-  { label: "Best Practices", score: 81, color: "#34d399" },
-  { label: "Responsiveness", score: 73, color: "#84cc16" },
+const TERMINAL_DEMO_LINES = [
+  { agent: "system", msg: "$ sitejudge --audit https://example.com", type: "log" },
+  { agent: "system", msg: "Initializing audit pipeline...", type: "log" },
+  { agent: "system", msg: "Pipeline: SEO → Accessibility → Links → Lighthouse → AI Judge", type: "log" },
+  { agent: "seo",    msg: "▸ Starting SEO analysis...", type: "step_start" },
+  { agent: "seo",    msg: "Fetching HTML from https://example.com...", type: "log" },
+  { agent: "seo",    msg: "Parsed meta tags, headings, OG data, robots.txt, sitemap", type: "log" },
+  { agent: "seo",    msg: "✓ SEO analysis complete — 4 issues found", type: "step_done" },
+  { agent: "accessibility", msg: "▸ Starting accessibility scan (Axe-core)...", type: "step_start" },
+  { agent: "accessibility", msg: "Launching headless browser for WCAG 2.1 AA audit...", type: "log" },
+  { agent: "accessibility", msg: "✓ Accessibility scan complete — 7 issues", type: "step_done" },
+  { agent: "broken_links", msg: "▸ Starting link integrity check...", type: "step_start" },
+  { agent: "broken_links", msg: "Scanned 42 links concurrently", type: "log" },
+  { agent: "broken_links", msg: "✓ Link check complete — 2/42 broken", type: "step_done" },
+  { agent: "lighthouse", msg: "▸ Starting Lighthouse performance audit...", type: "step_start" },
+  { agent: "lighthouse", msg: "Running Core Web Vitals measurement (LCP, FCP, TBT, CLS)...", type: "log" },
+  { agent: "lighthouse", msg: "Lighthouse scores — Perf: 72, A11y: 85, BP: 92, SEO: 90", type: "log" },
+  { agent: "lighthouse", msg: "✓ Lighthouse audit complete — Performance: 72", type: "step_done" },
+  { agent: "judge",  msg: "▸ Starting AI reasoning engine...", type: "step_start" },
+  { agent: "judge",  msg: "Connecting to Groq API (model: llama-3.3-70b-versatile)", type: "log" },
+  { agent: "judge",  msg: "AI synthesis complete. Overall score: 68/100", type: "log" },
+  { agent: "judge",  msg: "✓ AI report generated — Score: 68/100", type: "step_done" },
+  { agent: "system", msg: "★ Audit pipeline finished. Report ready.", type: "complete" },
 ];
 
 // PLANS removed for open-source model
-
-// ── Helpers ─────────────────────────────────────────────────────────────
-
-function scoreColor(s: number) {
-  if (s >= 90) return "#34d399";
-  if (s >= 75) return "#84cc16";
-  if (s >= 60) return "#f59e0b";
-  if (s >= 40) return "#f97316";
-  return "#f87171";
-}
 
 // ── Animated counter ────────────────────────────────────────────────────
 
@@ -117,6 +123,21 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [statsImageError, setStatsImageError] = useState(false);
   const [streakImageError, setStreakImageError] = useState(false);
+  const [visibleDemoLines, setVisibleDemoLines] = useState(0);
+
+  // Auto-advance the terminal demo lines
+  useEffect(() => {
+    if (visibleDemoLines >= TERMINAL_DEMO_LINES.length) {
+      // Reset after a pause
+      const resetTimer = setTimeout(() => setVisibleDemoLines(0), 4000);
+      return () => clearTimeout(resetTimer);
+    }
+    const timer = setTimeout(
+      () => setVisibleDemoLines((prev) => prev + 1),
+      visibleDemoLines === 0 ? 1200 : 300 + Math.random() * 400,
+    );
+    return () => clearTimeout(timer);
+  }, [visibleDemoLines]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -307,75 +328,57 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════
-          SAMPLE REPORT PREVIEW
+          LIVE TERMINAL DEMO PREVIEW
       ══════════════════════════════════════════════════════════ */}
       <section style={{ padding: "0 0 80px", position: "relative", zIndex: 1 }}>
-        <div className="container">
-          <div className="card anim-scale-in delay-4" style={{
-            padding: "clamp(24px, 4vw, 40px)",
-            background: "linear-gradient(145deg, rgba(17,17,32,0.95), rgba(12,12,20,0.9))",
-            boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(139,92,246,0.12)",
-          }}>
-            {/* Header row */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                {/* Overall ring */}
-                <div style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
-                  <svg width={80} height={80} viewBox="0 0 80 80" style={{ transform: "rotate(-90deg)" }}>
-                    <circle cx={40} cy={40} r={32} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={7} />
-                    <circle cx={40} cy={40} r={32} fill="none"
-                      stroke="url(#rg)" strokeWidth={7} strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 32}`}
-                      strokeDashoffset={`${2 * Math.PI * 32 * (1 - 0.72)}`}
-                      style={{ filter: "drop-shadow(0 0 8px rgba(139,92,246,0.6))" }}
-                    />
-                    <defs>
-                      <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#8b5cf6" />
-                        <stop offset="100%" stopColor="#60a5fa" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "1.4rem", color: "#a78bfa", lineHeight: 1 }}>72</span>
-                    <span style={{ fontSize: "0.6rem", color: "var(--text-3)" }}>/100</span>
-                  </div>
-                </div>
-                <div>
-                  <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.1rem", marginBottom: 2 }}>example.com</p>
-                  <p style={{ fontSize: "0.8rem", color: "var(--text-3)" }}>Sample report preview</p>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <span className="badge badge-critical">3 Critical</span>
-                <span className="badge badge-medium">8 Medium</span>
-                <span className="badge badge-minor">14 Minor</span>
-              </div>
+        <div className="container" style={{ maxWidth: 780 }}>
+          <div className="terminal anim-scale-in delay-4 terminal-demo">
+            {/* Title bar */}
+            <div className="terminal-titlebar">
+              <div className="terminal-dot" style={{ background: "#f87171" }} />
+              <div className="terminal-dot" style={{ background: "#fbbf24" }} />
+              <div className="terminal-dot" style={{ background: "#34d399" }} />
+              <span className="terminal-titlebar-text">
+                sitejudge — live audit demo
+              </span>
             </div>
 
-            {/* Score grid */}
-            <div className="preview-score-grid">
-              {SCORES_PREVIEW.map(({ label, score, color }) => (
-                <div key={label} style={{
-                  background: "rgba(255,255,255,0.025)", borderRadius: "var(--r-md)",
-                  padding: "14px 16px", border: "1px solid var(--border)",
-                }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <span style={{ fontSize: "0.85rem", color: "var(--text-2)" }}>{label}</span>
-                    <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.05rem", color }}>{score}</span>
+            {/* Terminal body with auto-typed lines */}
+            <div className="terminal-body" style={{ minHeight: 300, maxHeight: 360 }}>
+              {TERMINAL_DEMO_LINES.slice(0, visibleDemoLines).map((line, i) => {
+                const agentColorClass = `terminal-agent-${line.agent}`;
+                const msgClass = `terminal-msg terminal-msg-${line.type}`;
+                return (
+                  <div key={i} className="terminal-line" style={{ animationDelay: `${i * 30}ms` }}>
+                    <span className={`terminal-agent ${agentColorClass}`}>
+                      [{line.agent}]
+                    </span>
+                    <span className={msgClass}>{line.msg}</span>
                   </div>
-                  <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${score}%`, background: color }} />
-                  </div>
+                );
+              })}
+              {visibleDemoLines < TERMINAL_DEMO_LINES.length && (
+                <div className="terminal-line">
+                  <span style={{ color: "#475569" }}>$</span>
+                  <span className="terminal-cursor" />
                 </div>
-              ))}
+              )}
             </div>
 
-            <p style={{ textAlign: "center", marginTop: 20, fontSize: "0.78rem", color: "var(--text-3)" }}>
-              Sample data — your real report includes AI explanations, code fixes, and screenshots
-            </p>
+            {/* Footer */}
+            <div className="terminal-footer">
+              <span>demo — no real scan in progress</span>
+              <span style={{ color: "#a78bfa" }}>
+                {visibleDemoLines >= TERMINAL_DEMO_LINES.length
+                  ? "✓ complete"
+                  : `${Math.round((visibleDemoLines / TERMINAL_DEMO_LINES.length) * 100)}% progress`}
+              </span>
+            </div>
           </div>
+
+          <p style={{ textAlign: "center", marginTop: 16, fontSize: "0.78rem", color: "var(--text-3)" }}>
+            This is what you&apos;ll see — real-time backend activity streamed to your screen
+          </p>
         </div>
       </section>
 
